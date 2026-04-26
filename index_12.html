@@ -1,0 +1,1717 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MoonAkademy</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#F7F6F2;
+  --surface:#FFFFFF;
+  --surface2:#F0EFE9;
+  --border:#E2E0D8;
+  --text:#1A1A18;
+  --text2:#6B6960;
+  --text3:#A8A69E;
+  --accent:#1A5C3A;
+  --accent-bg:#E8F5EE;
+  --amber:#92600A;
+  --amber-bg:#FEF3DC;
+  --red:#8B2020;
+  --red-bg:#FDEBEB;
+  --blue:#1A3F5C;
+  --blue-bg:#E8F0F7;
+  --radius:8px;
+  --radius-lg:12px;
+}
+html,body{overflow-x:hidden;max-width:100%;width:100%;}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;}
+button{font-family:inherit;cursor:pointer;}
+input,select,textarea{font-family:inherit;}
+
+/* SETUP SCREEN */
+#setup-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;}
+.setup-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:40px;max-width:480px;width:100%;}
+.setup-logo{font-size:22px;font-weight:600;margin-bottom:4px;}
+.setup-logo span{color:var(--accent);}
+.setup-sub{color:var(--text2);font-size:13px;margin-bottom:28px;}
+.setup-label{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px;display:block;}
+.setup-input{width:100%;border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;font-size:13px;color:var(--text);background:var(--bg);margin-bottom:16px;outline:none;}
+.setup-input:focus{border-color:var(--accent);}
+.setup-hint{font-size:11px;color:var(--text3);margin-top:-10px;margin-bottom:16px;}
+.btn-connect{width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);padding:11px;font-size:14px;font-weight:500;}
+.btn-connect:hover{opacity:0.9;}
+.setup-error{color:var(--red);font-size:12px;margin-top:12px;display:none;}
+
+/* APP */
+#app{display:none;width:100%;height:100vh;overflow:hidden;}
+.layout{display:flex;height:100%;width:100%;}
+
+/* SIDEBAR */
+.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+.sidebar-header{padding:18px 16px 14px;border-bottom:1px solid var(--border);}
+.logo{font-size:15px;font-weight:600;color:var(--text);}
+.logo span{color:var(--accent);}
+.logo-role{font-size:11px;color:var(--text3);margin-top:2px;}
+.nav-group-label{font-size:10px;font-weight:500;color:var(--text3);padding:14px 16px 4px;text-transform:uppercase;letter-spacing:.08em;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;font-size:13px;color:var(--text2);cursor:pointer;border-left:2px solid transparent;transition:all .12s;}
+.nav-item:hover{background:var(--surface2);color:var(--text);}
+.nav-item.active{color:var(--accent);background:var(--accent-bg);border-left-color:var(--accent);font-weight:500;}
+.nav-icon{width:15px;height:15px;flex-shrink:0;opacity:.7;}
+.nav-item.active .nav-icon{opacity:1;}
+.sidebar-footer{margin-top:auto;padding:14px 16px;border-top:1px solid var(--border);}
+.sidebar-user{display:flex;align-items:center;gap:10px;}
+.user-avatar{width:30px;height:30px;border-radius:50%;background:var(--accent-bg);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;}
+.user-name{font-size:12px;font-weight:500;}
+.user-role{font-size:11px;color:var(--text3);}
+
+/* MAIN */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.topbar-title{font-size:15px;font-weight:600;}
+.topbar-actions{display:flex;gap:8px;align-items:center;}
+.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:var(--radius);padding:7px 14px;font-size:12px;font-weight:500;}
+.btn-primary:hover{opacity:.88;}
+.btn-secondary{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:7px 12px;font-size:12px;color:var(--text2);}
+.btn-secondary:hover{background:var(--surface2);}
+.btn-danger{background:var(--red-bg);border:1px solid #f5c6c6;border-radius:var(--radius);padding:7px 12px;font-size:12px;color:var(--red);}
+
+.content{flex:1;overflow-y:auto;padding:20px 24px;display:none;flex-direction:column;gap:16px;}
+.content.active{display:flex;}
+
+/* LOADING */
+.loading{display:flex;align-items:center;justify-content:center;padding:60px;color:var(--text3);font-size:13px;gap:10px;}
+.spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* METRICS */
+.metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.metric{background:var(--surface2);border-radius:var(--radius);padding:14px;}
+.metric-label{font-size:11px;color:var(--text2);margin-bottom:6px;}
+.metric-value{font-size:24px;font-weight:600;}
+.metric-sub{font-size:11px;color:var(--text3);margin-top:3px;}
+.metric.green .metric-value{color:var(--accent);}
+.metric.amber .metric-value{color:var(--amber);}
+.metric.red .metric-value{color:var(--red);}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.card-title{font-size:13px;font-weight:600;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+
+/* TABLE */
+.tbl-wrap{border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden;background:var(--surface);}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead tr{background:var(--surface2);}
+th{text-align:left;padding:10px 14px;font-size:11px;font-weight:500;color:var(--text2);white-space:nowrap;border-bottom:1px solid var(--border);}
+td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:#FAFAF7;}
+
+/* BADGES */
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500;}
+.badge-green{background:var(--accent-bg);color:var(--accent);}
+.badge-amber{background:var(--amber-bg);color:var(--amber);}
+.badge-red{background:var(--red-bg);color:var(--red);}
+.badge-blue{background:var(--blue-bg);color:var(--blue);}
+.badge-gray{background:var(--surface2);color:var(--text2);}
+
+/* AVATAR */
+.av{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;}
+.av-green{background:var(--accent-bg);color:var(--accent);}
+.av-blue{background:var(--blue-bg);color:var(--blue);}
+.av-amber{background:var(--amber-bg);color:var(--amber);}
+.av-purple{background:#EDE9FD;color:#4C35A8;}
+.student-cell{display:flex;align-items:center;gap:10px;}
+.student-name{font-weight:500;}
+.student-date{font-size:11px;color:var(--text3);}
+
+/* MONTH CARDS */
+.month-card{background:var(--surface2);border-radius:var(--radius);padding:14px;}
+.month-name{font-size:11px;color:var(--text2);margin-bottom:6px;}
+.month-amount{font-size:20px;font-weight:600;}
+.month-count{font-size:11px;color:var(--text3);margin-top:3px;}
+
+/* PROGRESS */
+.prog-wrap{width:70px;}
+.prog-label{font-size:10px;color:var(--text3);margin-bottom:3px;}
+.prog-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--accent);border-radius:2px;}
+
+/* SEARCH ROW */
+.search-row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.search-input{border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;font-size:13px;color:var(--text);background:var(--surface);width:240px;outline:none;}
+.search-input:focus{border-color:var(--accent);}
+.filter-select{border:1px solid var(--border);border-radius:var(--radius);padding:7px 10px;font-size:12px;color:var(--text2);background:var(--surface);outline:none;}
+
+/* GROUP CARD */
+.group-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;}
+.group-card-name{font-size:14px;font-weight:600;margin-bottom:10px;}
+.group-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.group-stat-label{font-size:11px;color:var(--text2);}
+.group-stat-val{font-size:13px;font-weight:500;margin-top:1px;}
+.group-avatars{display:flex;flex-wrap:wrap;gap:5px;}
+
+/* TEACHER CARD */
+.teacher-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;}
+.teacher-head{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.teacher-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;}
+.teacher-name{font-size:14px;font-weight:600;}
+.teacher-role{font-size:12px;color:var(--text2);}
+.teacher-rows{display:flex;flex-direction:column;gap:8px;}
+.teacher-row{display:flex;justify-content:space-between;font-size:12px;}
+.teacher-row span:first-child{color:var(--text2);}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:100;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border-radius:var(--radius-lg);padding:24px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;position:relative;}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:20px;}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:18px;color:var(--text3);cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:4px;}
+.modal-close:hover{background:var(--surface2);}
+.form-row{margin-bottom:14px;}
+.form-label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px;}
+.form-input{width:100%;border:1px solid var(--border);border-radius:var(--radius);padding:9px 11px;font-size:13px;color:var(--text);background:var(--bg);outline:none;}
+.form-input:focus{border-color:var(--accent);}
+.form-select{width:100%;border:1px solid var(--border);border-radius:var(--radius);padding:9px 11px;font-size:13px;color:var(--text);background:var(--bg);outline:none;}
+.form-2col{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);}
+.form-error{color:var(--red);font-size:12px;margin-top:-8px;margin-bottom:8px;display:none;}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:0;}
+.tab{padding:9px 18px;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:#1A1A18;color:#fff;border-radius:var(--radius);padding:11px 16px;font-size:13px;z-index:999;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast.error{background:var(--red);}
+
+/* EMPTY */
+.empty{text-align:center;padding:48px 24px;color:var(--text3);}
+.empty-icon{font-size:36px;margin-bottom:10px;}
+.empty-text{font-size:13px;}
+
+/* PAYMENT CARD (mobile) */
+.pay-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;overflow:hidden;}
+.pay-card .smc-actions{margin-top:12px;padding-top:10px;border-top:1px solid var(--border);}
+.pay-card-top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.pay-amount-block{display:flex;flex-direction:row;align-items:center;gap:6px;flex-shrink:0;}
+.pay-amount-sum{font-size:17px;font-weight:700;}
+.pay-amount-block.paid .pay-amount-sum{color:var(--accent);}
+.pay-amount-block.wait .pay-amount-sum{color:var(--amber);}
+.pay-amount-block.debt .pay-amount-sum{color:var(--red);}
+.pay-icon{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:700;}
+.pay-icon-ok{background:var(--accent-bg);color:var(--accent);}
+.pay-icon-wait{background:var(--amber-bg);color:var(--amber);}
+.pay-icon-debt{background:var(--red-bg);color:var(--red);}
+
+/* STUDENT MOBILE CARDS */
+.student-mobile-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  margin-bottom: 10px;
+}
+.smc-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.smc-info {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+.smc-info > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.smc-info > div > span:first-child {
+  color: var(--text2);
+}
+.smc-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* FIX TOPBAR OVERFLOW */
+.topbar { flex-wrap: nowrap; overflow: hidden; }
+.topbar-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; }
+.topbar-actions { flex-shrink: 0; }
+
+/* FIX TABLE OVERFLOW */
+.tbl-wrap { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table { min-width: unset; }
+
+@media (max-width: 768px) {
+  table { min-width: 480px; font-size: 12px; }
+  .topbar-title { font-size: 16px; }
+  .btn-primary { font-size: 12px; padding: 7px 10px; white-space: nowrap; }
+  .tbl-wrap { max-width: 100%; }
+}
+
+/* ================================================
+   MOBILE RESPONSIVE — телефоны до 768px
+   ================================================ */
+@media (max-width: 768px) {
+  /* Скрываем сайдбар — заменяем нижней навигацией */
+  .sidebar { display: none; }
+
+  /* Главный контейнер */
+  .layout { flex-direction: column; height: 100vh; }
+
+  .main { 
+    flex: 1; 
+    display: flex; 
+    flex-direction: column; 
+    overflow: hidden;
+    padding-bottom: 64px; /* место для нижней навигации */
+  }
+
+  /* Топбар */
+  .topbar { 
+    padding: 12px 16px; 
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .topbar-title { font-size: 17px; }
+  .topbar-actions .btn-primary { 
+    padding: 7px 12px; 
+    font-size: 12px; 
+  }
+
+  /* Контент */
+  .content { 
+    padding: 12px 12px 16px;
+    gap: 12px;
+  }
+
+  /* Метрики — 2 колонки на телефоне */
+  .metrics-grid { 
+    grid-template-columns: 1fr 1fr; 
+    gap: 8px; 
+  }
+  .metric { padding: 12px; }
+  .metric-value { font-size: 22px; }
+  .metric-label { font-size: 11px; }
+
+  /* Две колонки → одна */
+  .two-col { grid-template-columns: 1fr; gap: 10px; }
+  .three-col { grid-template-columns: 1fr; gap: 8px; }
+
+  /* Таблицы — скролл по горизонтали */
+  .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { min-width: 600px; font-size: 12px; }
+  th, td { padding: 8px 10px; }
+
+  /* Скрываем некоторые колонки на мобильном */
+  .tbl-wrap table th:nth-child(5),
+  .tbl-wrap table td:nth-child(5),
+  .tbl-wrap table th:nth-child(6),
+  .tbl-wrap table td:nth-child(6) { display: none; }
+
+  /* Карточки студентов — полная ширина */
+  .student-cell { gap: 8px; }
+  .student-name { font-size: 13px; }
+
+  /* Группы */
+  .group-card { padding: 14px; margin-bottom: 10px; }
+  .group-card-name { font-size: 14px; }
+  .group-stats { grid-template-columns: 1fr 1fr; }
+
+  /* Оплаты — месяцы */
+  .month-grid { grid-template-columns: 1fr; gap: 8px; }
+  .month-card { padding: 12px; }
+  .month-amount { font-size: 20px; }
+
+  /* Карточки преподавателей */
+  .teacher-card { padding: 14px; }
+  .teacher-head { gap: 10px; }
+  .teacher-av { width: 38px; height: 38px; font-size: 13px; }
+
+  /* Поиск */
+  .search-row { flex-wrap: wrap; gap: 8px; }
+  .search-input { width: 100%; }
+  .filter-select { flex: 1; font-size: 12px; padding: 6px 8px; }
+
+  /* Модальные окна — снизу как sheet */
+  .modal-overlay { align-items: flex-end; }
+  .modal { 
+    border-radius: 20px 20px 0 0; 
+    width: 100%; 
+    max-width: 100%;
+    padding: 20px 16px 32px;
+    max-height: 90vh;
+  }
+  .modal-title { font-size: 17px; }
+  .form-input, .form-select { 
+    padding: 12px; 
+    font-size: 16px; /* предотвращает зум на iOS */
+  }
+  .form-2col { grid-template-columns: 1fr; }
+  .modal-footer { gap: 8px; }
+  .modal-footer .btn-primary,
+  .modal-footer .btn-secondary { 
+    padding: 13px; 
+    font-size: 15px; 
+    flex: 1;
+  }
+
+  /* Аватары */
+  .av { width: 36px; height: 36px; font-size: 12px; }
+
+  /* Кнопки действий в таблице */
+  .tbl-wrap button { 
+    padding: 4px 8px !important; 
+    font-size: 11px !important; 
+  }
+
+  /* Табы оплат */
+  .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tab { white-space: nowrap; padding: 8px 14px; }
+
+  /* Карточки группы на мобиле */
+  .two-col .group-card { padding: 14px; }
+}
+
+/* НИЖНЯЯ НАВИГАЦИЯ — только мобильный */
+.mobile-nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -2px 12px rgba(0,0,0,.08);
+    z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .mobile-nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 4px 10px;
+    gap: 3px;
+    border: none;
+    background: none;
+    color: var(--text3);
+    font-size: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color .12s;
+  }
+  .mobile-nav-btn.active {
+    color: var(--accent);
+  }
+  .mobile-nav-btn svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+
+/* ================================================
+   MOBILE — все телефоны до 768px
+   ================================================ */
+@media (max-width: 768px) {
+
+  /* Layout */
+  .sidebar { display: none !important; }
+  .layout { height: 100vh; overflow: hidden; }
+  .main { 
+    display: flex; 
+    flex-direction: column; 
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Topbar */
+  .topbar { 
+    padding: 12px 14px; 
+    flex-shrink: 0;
+  }
+  .topbar-title { font-size: 18px; font-weight: 600; }
+  .topbar-actions { gap: 6px; }
+  .btn-primary { padding: 8px 12px; font-size: 13px; }
+  .btn-secondary { padding: 8px 10px; font-size: 13px; }
+
+  /* Content area — scrollable */
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 12px 12px calc(80px + env(safe-area-inset-bottom, 16px)); /* nav + safe area */
+    gap: 12px;
+    display: none;
+    flex-direction: column;
+  }
+  .content.active { display: flex; }
+
+  /* Metrics — 2x2 grid */
+  .metrics-grid { 
+    grid-template-columns: 1fr 1fr; 
+    gap: 8px; 
+  }
+  .metric { padding: 12px 10px; }
+  .metric-value { font-size: 22px; }
+  .metric-label { font-size: 11px; }
+  .metric-sub { font-size: 11px; }
+
+  /* Cards */
+  .card { padding: 14px; border-radius: 14px; }
+  .two-col { grid-template-columns: 1fr !important; gap: 10px; }
+  .three-col { grid-template-columns: 1fr !important; gap: 8px; }
+
+  /* DASHBOARD — заменяем таблицу на карточки */
+  #dash-content table { display: none; }
+  #dash-content .tbl-wrap { 
+    background: none; 
+    border: none; 
+    border-radius: 0;
+    padding: 0;
+  }
+  #dash-content tbody tr {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  #dash-content thead { display: none; }
+  #dash-content td { 
+    border: none; 
+    padding: 0; 
+    display: block;
+  }
+  #dash-content td:first-child { flex: 1; }
+  #dash-content td:nth-child(2) { display: none; }
+  #dash-content td:last-child { flex-shrink: 0; }
+
+  /* STUDENTS table → card list */
+  #students-table table { display: none; }
+  #students-table .tbl-wrap {
+    background: none;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    overflow: visible;
+  }
+
+  /* Search row */
+  .search-row { 
+    flex-wrap: wrap; 
+    gap: 8px; 
+  }
+  .search-input { 
+    width: 100%;
+    font-size: 16px; /* no zoom on iOS */
+    padding: 11px 12px;
+    border-radius: 12px;
+  }
+  .filter-select { 
+    flex: 1;
+    font-size: 14px;
+    padding: 9px 8px;
+    border-radius: 10px;
+  }
+
+  /* Groups */
+  .two-col .group-card,
+  .group-card { 
+    padding: 14px;
+    margin-bottom: 10px;
+    border-radius: 14px;
+  }
+  .group-card-name { font-size: 15px; }
+  .group-stats { grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  /* Payments months */
+  .month-grid { 
+    grid-template-columns: 1fr !important;
+    gap: 8px; 
+  }
+  .month-card { padding: 14px; border-radius: 12px; }
+  .month-amount { font-size: 22px; }
+
+  /* Payments table → scrollable */
+  .tbl-wrap { 
+    overflow-x: auto; 
+    -webkit-overflow-scrolling: touch; 
+    border-radius: 12px;
+  }
+  table { 
+    min-width: 500px;
+    font-size: 13px;
+  }
+  th, td { padding: 9px 10px; }
+
+  /* Hide some columns */
+  .tbl-wrap table th:nth-child(4),
+  .tbl-wrap table td:nth-child(4),
+  .tbl-wrap table th:nth-child(6),
+  .tbl-wrap table td:nth-child(6) { display: none; }
+
+  /* Teacher cards */
+  .teacher-card { padding: 14px; border-radius: 14px; }
+  .teacher-head { gap: 10px; }
+  .teacher-av { width: 40px; height: 40px; font-size: 13px; }
+  .teacher-name { font-size: 15px; }
+  .teacher-rows { gap: 8px; }
+  .teacher-row { font-size: 13px; }
+
+  /* Modal → bottom sheet */
+  .modal-overlay { 
+    align-items: flex-end !important; 
+  }
+  .modal { 
+    border-radius: 20px 20px 0 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 16px 16px calc(80px + env(safe-area-inset-bottom, 0px));
+    max-height: 92vh;
+  }
+  .modal::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 0 auto 16px;
+  }
+  .modal-title { font-size: 17px; margin-bottom: 16px; }
+  .modal-close { top: 20px; }
+  .form-input, .form-select { 
+    padding: 13px 12px;
+    font-size: 16px !important; /* prevent iOS zoom */
+    border-radius: 12px;
+  }
+  .form-2col { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .modal-footer { 
+    gap: 8px; 
+    margin-top: 16px;
+    padding-top: 14px;
+  }
+  .modal-footer button { 
+    padding: 14px !important; 
+    font-size: 15px !important;
+    border-radius: 12px;
+    flex: 1;
+  }
+
+  /* Tabs */
+  .tabs { 
+    overflow-x: auto; 
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+  }
+  .tab { white-space: nowrap; padding: 9px 14px; font-size: 13px; }
+
+  /* Avatar */
+  .av { width: 36px; height: 36px; font-size: 11px; }
+  .student-cell { gap: 8px; }
+
+  /* Action buttons in table */
+  tbody button { 
+    padding: 4px 8px !important; 
+    font-size: 11px !important;
+    border-radius: 6px !important;
+  }
+}
+
+/* НИЖНЯЯ НАВИГАЦИЯ */
+.mobile-nav { display: none; }
+
+@media (max-width: 768px) {
+  .mobile-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border-top: 1.5px solid var(--border);
+    box-shadow: 0 -2px 16px rgba(0,0,0,.08);
+    z-index: 200;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    height: 64px;
+  }
+  .mobile-nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 4px 8px;
+    gap: 3px;
+    border: none;
+    background: none;
+    color: var(--text3);
+    font-size: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color .12s;
+  }
+  .mobile-nav-btn.active { color: var(--accent); }
+  .mobile-nav-btn svg { width: 22px; height: 22px; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- SETUP SCREEN -->
+<div id="setup-screen">
+  <div class="setup-card">
+    <div class="setup-logo">Moon<span>Akademy</span></div>
+    <div class="setup-sub">Подключите вашу базу данных Supabase</div>
+
+    <label class="setup-label">Project URL</label>
+    <input class="setup-input" id="sb-url" placeholder="https://xxxx.supabase.co" />
+
+    <label class="setup-label">Anon Key</label>
+    <input class="setup-input" id="sb-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6Ikp..." />
+    <div class="setup-hint">Настройки → API → Project API keys → anon public</div>
+
+    <button class="btn-connect" onclick="connectSupabase()">Подключить →</button>
+    <div class="setup-error" id="setup-error"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="layout">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">Moon<span>Akademy</span></div>
+        <div class="logo-role">Администратор</div>
+      </div>
+
+      <div class="nav-group-label">Главное</div>
+      <div class="nav-item active" onclick="nav('dashboard',this)">
+        <svg class="nav-icon" viewBox="0 0 15 15" fill="none"><rect x="1" y="1" width="5.5" height="5.5" rx="1" fill="currentColor"/><rect x="8.5" y="1" width="5.5" height="5.5" rx="1" fill="currentColor" opacity=".5"/><rect x="1" y="8.5" width="5.5" height="5.5" rx="1" fill="currentColor" opacity=".5"/><rect x="8.5" y="8.5" width="5.5" height="5.5" rx="1" fill="currentColor" opacity=".3"/></svg>
+        Дашборд
+      </div>
+      <div class="nav-item" onclick="nav('students',this)">
+        <svg class="nav-icon" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 13.5c0-3.3 2.7-5 6-5s6 1.7 6 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Студенты
+      </div>
+      <div class="nav-item" onclick="nav('groups',this)">
+        <svg class="nav-icon" viewBox="0 0 15 15" fill="none"><rect x="1" y="2.5" width="13" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M5 2.5v10M10 2.5v10M1 7h13" stroke="currentColor" stroke-width="1" opacity=".5"/></svg>
+        Группы
+      </div>
+
+      <div class="nav-group-label">Финансы</div>
+      <div class="nav-item" onclick="nav('payments',this)">
+        <svg class="nav-icon" viewBox="0 0 15 15" fill="none"><rect x="1" y="3.5" width="13" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 7h13" stroke="currentColor" stroke-width="1" opacity=".5"/><rect x="3" y="9" width="3" height="1.5" rx=".5" fill="currentColor" opacity=".5"/></svg>
+        Оплаты
+      </div>
+
+      <div class="nav-group-label">Справочники</div>
+      <div class="nav-item" onclick="nav('teachers',this)">
+        <svg class="nav-icon" viewBox="0 0 15 15" fill="none"><path d="M7.5 1L14 4.5v4C14 12 7.5 14.5 7.5 14.5S1 12 1 8.5v-4L7.5 1Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+        Преподаватели
+      </div>
+      <div class="nav-item" onclick="nav('managers',this)">
+        <svg class="nav-icon" viewBox="0 0 15 15" fill="none"><circle cx="5" cy="5" r="2.5" stroke="currentColor" stroke-width="1.2"/><circle cx="10.5" cy="5" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M0 13c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M10.5 8.5c1.4.2 2.8 1.3 3 4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Менеджеры
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="user-avatar">АД</div>
+          <div>
+            <div class="user-name">Администратор</div>
+            <div class="user-role" id="db-url-label">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="topbar">
+        <div class="topbar-title" id="page-title">Дашборд</div>
+        <div class="topbar-actions" id="topbar-actions">
+          <button id="mobile-add-btn" onclick="" style="display:none;width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:22px;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">+</button>
+        </div>
+      </div>
+
+      <!-- DASHBOARD -->
+      <div class="content active" id="screen-dashboard">
+        <div class="loading" id="dash-loading"><div class="spinner"></div>Загрузка...</div>
+        <div id="dash-content" style="display:none;flex-direction:column;gap:16px;"></div>
+      </div>
+
+      <!-- STUDENTS -->
+      <div class="content" id="screen-students">
+        <div class="search-row">
+          <input class="search-input" id="student-search" placeholder="Поиск по имени или телефону..." oninput="filterStudents()">
+          <div style="display:flex;gap:8px;">
+            <select class="filter-select" id="student-group-filter" onchange="filterStudents()">
+              <option value="">Все группы</option>
+            </select>
+            <select class="filter-select" id="student-status-filter" onchange="filterStudents()">
+              <option value="">Все статусы</option>
+              <option value="Оплачено">Оплачено</option>
+              <option value="Ожидает">Ожидает</option>
+              <option value="Долг">Долг</option>
+            </select>
+          </div>
+        </div>
+        <div class="loading" id="students-loading"><div class="spinner"></div>Загрузка...</div>
+        <div id="students-table"></div>
+      </div>
+
+      <!-- GROUPS -->
+      <div class="content" id="screen-groups">
+        <div class="loading" id="groups-loading"><div class="spinner"></div>Загрузка...</div>
+        <div id="groups-content"></div>
+      </div>
+
+      <!-- PAYMENTS -->
+      <div class="content" id="screen-payments">
+        <div class="three-col" id="payments-months"></div>
+        <div class="tbl-wrap">
+          <div class="tabs" id="payments-tabs"></div>
+          <div class="loading" id="payments-loading"><div class="spinner"></div>Загрузка...</div>
+          <div id="payments-table"></div>
+        </div>
+      </div>
+
+      <!-- TEACHERS -->
+      <div class="content" id="screen-teachers">
+        <div class="loading" id="teachers-loading"><div class="spinner"></div>Загрузка...</div>
+        <div class="two-col" id="teachers-content"></div>
+      </div>
+
+      <!-- MANAGERS -->
+      <div class="content" id="screen-managers">
+        <div class="loading" id="managers-loading"><div class="spinner"></div>Загрузка...</div>
+        <div class="two-col" id="managers-content"></div>
+      </div>
+    </div>
+  </div>
+
+
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-student">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-student')">✕</button>
+    <div class="modal-title" id="student-modal-title">Добавить студента</div>
+    <input type="hidden" id="student-id">
+    <div class="form-2col">
+      <div class="form-row" style="grid-column:1/-1">
+        <label class="form-label">ФИО *</label>
+        <input class="form-input" id="s-name" placeholder="Иванова Айгүл Асановна" oninput="this.value=this.value.replace(/[^\p{L}\- ]/gu,'')">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Телефон</label>
+        <input class="form-input" id="s-phone" placeholder="+996 700 000 000" inputmode="numeric" oninput="formatKGPhone(this)">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Пол</label>
+        <select class="form-select" id="s-gender">
+          <option value="">—</option>
+          <option value="Жен">Жен</option>
+          <option value="Муж">Муж</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Группа</label>
+        <select class="form-select" id="s-group"></select>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Менеджер</label>
+        <select class="form-select" id="s-manager"></select>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Уровень</label>
+        <select class="form-select" id="s-level">
+          <option value="Жакшы (0-1)">Жакшы (0-1)</option>
+          <option value="Орто (1-2)">Орто (1-2)</option>
+          <option value="Жогору (2-3)">Жогору (2-3)</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Дата записи</label>
+        <input class="form-input" id="s-enrolled" type="date">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-student')">Отмена</button>
+      <button class="btn-primary" onclick="saveStudent()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-payment">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-payment')">✕</button>
+    <div class="modal-title" id="payment-modal-title">Записать оплату</div>
+    <input type="hidden" id="pay-id">
+    <div class="form-row">
+      <label class="form-label">Студент *</label>
+      <select class="form-select" id="pay-student"></select>
+    </div>
+    <div class="form-2col">
+      <div class="form-row">
+        <label class="form-label">Месяц</label>
+        <select class="form-select" id="pay-month">
+          <option value="1">Январь</option><option value="2">Февраль</option>
+          <option value="3">Март</option><option value="4">Апрель</option>
+          <option value="5">Май</option><option value="6">Июнь</option>
+          <option value="7">Июль</option><option value="8">Август</option>
+          <option value="9">Сентябрь</option><option value="10">Октябрь</option>
+          <option value="11">Ноябрь</option><option value="12">Декабрь</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Год</label>
+        <input class="form-input" id="pay-year" type="number" value="2026">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Сумма (сом)</label>
+        <input class="form-input" id="pay-amount" type="number" placeholder="4000">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Статус</label>
+        <select class="form-select" id="pay-status">
+          <option value="Оплачено">Оплачено</option>
+          <option value="Ожидает">Ожидает</option>
+          <option value="Долг">Долг</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Дата оплаты</label>
+        <input class="form-input" id="pay-date" type="date">
+      </div>
+      <div class="form-row">
+        <label class="form-label">№ урока</label>
+        <input class="form-input" id="pay-lesson" type="number" placeholder="1">
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Комментарий</label>
+      <input class="form-input" id="pay-comment" placeholder="Опционально...">
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-payment')">Отмена</button>
+      <button class="btn-primary" onclick="savePayment()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-teacher">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-teacher')">✕</button>
+    <div class="modal-title" id="teacher-modal-title">Добавить преподавателя</div>
+    <input type="hidden" id="t-id">
+    <div class="form-row">
+      <label class="form-label">ФИО *</label>
+      <input class="form-input" id="t-name" placeholder="Имя преподавателя" oninput="this.value=this.value.replace(/[^\p{L}\- ]/gu,'')">
+    </div>
+    <div class="form-row">
+      <label class="form-label">Телефон</label>
+      <input class="form-input" id="t-phone" placeholder="+996 700 000 000" inputmode="numeric" oninput="formatKGPhone(this)">
+    </div>
+    <div class="form-row">
+      <label class="form-label">Предметы (через запятую)</label>
+      <input class="form-input" id="t-subjects" placeholder="Тасхиих, Тажвид">
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-teacher')">Отмена</button>
+      <button class="btn-primary" onclick="saveTeacher()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-manager">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-manager')">✕</button>
+    <div class="modal-title">Добавить менеджера</div>
+    <input type="hidden" id="m-id">
+    <div class="form-row">
+      <label class="form-label">Имя *</label>
+      <input class="form-input" id="m-name" placeholder="Имя менеджера" oninput="this.value=this.value.replace(/[^\p{L}\- ]/gu,'')">
+    </div>
+    <div class="form-row">
+      <label class="form-label">Телефон</label>
+      <input class="form-input" id="m-phone" placeholder="+996 700 000 000" inputmode="numeric" oninput="formatKGPhone(this)">
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-manager')">Отмена</button>
+      <button class="btn-primary" onclick="saveManager()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-nav">
+  <button class="mobile-nav-btn active" onclick="mobileNav('dashboard',this)">
+    <svg viewBox="0 0 15 15" fill="none"><rect x="1" y="1" width="5.5" height="5.5" rx="1" fill="currentColor"/><rect x="8.5" y="1" width="5.5" height="5.5" rx="1" fill="currentColor" opacity=".5"/><rect x="1" y="8.5" width="5.5" height="5.5" rx="1" fill="currentColor" opacity=".5"/><rect x="8.5" y="8.5" width="5.5" height="5.5" rx="1" fill="currentColor" opacity=".3"/></svg>
+    Главная
+  </button>
+  <button class="mobile-nav-btn" onclick="mobileNav('students',this)">
+    <svg viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 13.5c0-3.3 2.7-5 6-5s6 1.7 6 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    Студенты
+  </button>
+  <button class="mobile-nav-btn" onclick="mobileNav('payments',this)">
+    <svg viewBox="0 0 15 15" fill="none"><rect x="1" y="3.5" width="13" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 7h13" stroke="currentColor" stroke-width="1" opacity=".5"/><rect x="3" y="9" width="3" height="1.5" rx=".5" fill="currentColor" opacity=".5"/></svg>
+    Оплаты
+  </button>
+  <button class="mobile-nav-btn" onclick="mobileNav('groups',this)">
+    <svg viewBox="0 0 15 15" fill="none"><rect x="1" y="2.5" width="13" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M5 2.5v10M10 2.5v10M1 7h13" stroke="currentColor" stroke-width="1" opacity=".5"/></svg>
+    Группы
+  </button>
+  <button class="mobile-nav-btn" onclick="mobileNav('teachers',this)">
+    <svg viewBox="0 0 15 15" fill="none"><path d="M7.5 1L14 4.5v4C14 12 7.5 14.5 7.5 14.5S1 12 1 8.5v-4L7.5 1Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+    Учителя
+  </button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ==================== SUPABASE ====================
+let SB_URL = '', SB_KEY = '';
+
+async function sbFetch(path, options={}) {
+  const res = await fetch(SB_URL + '/rest/v1/' + path, {
+    ...options,
+    headers: {
+      'apikey': SB_KEY,
+      'Authorization': 'Bearer ' + SB_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': options.prefer || 'return=representation',
+      ...options.headers
+    }
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || res.statusText);
+  }
+  if (res.status === 204) return null;
+  return res.json();
+}
+
+const db = {
+  get: (table, params='') => sbFetch(table + '?' + params),
+  post: (table, data) => sbFetch(table, { method:'POST', body: JSON.stringify(data) }),
+  patch: (table, id, data) => sbFetch(table + '?id=eq.' + id, { method:'PATCH', body: JSON.stringify(data) }),
+  delete: (table, id) => sbFetch(table + '?id=eq.' + id, { method:'DELETE', prefer:'return=minimal' })
+};
+
+// ==================== CACHE ====================
+let cache = { students:[], groups:[], teachers:[], managers:[], payments:[] };
+let currentPayMonth = new Date().getMonth() + 1;
+let currentPayYear = new Date().getFullYear();
+
+// ==================== CONNECT ====================
+async function connectSupabase() {
+  SB_URL = document.getElementById('sb-url').value.trim().replace(/\/$/, '');
+  SB_KEY = document.getElementById('sb-key').value.trim();
+  const err = document.getElementById('setup-error');
+  if (!SB_URL || !SB_KEY) { err.textContent='Заполните оба поля'; err.style.display='block'; return; }
+  try {
+    await db.get('students', 'limit=1');
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    document.getElementById('db-url-label').textContent = SB_URL.replace('https://','').split('.')[0];
+    loadAll();
+  } catch(e) {
+    err.textContent = 'Ошибка подключения: ' + e.message;
+    err.style.display = 'block';
+  }
+}
+
+// ==================== LOAD ALL ====================
+async function loadAll() {
+  try {
+    const [students, groups, teachers, managers, payments] = await Promise.all([
+      db.get('students', 'order=created_at.desc'),
+      db.get('groups', 'order=name'),
+      db.get('teachers', 'order=name'),
+      db.get('managers', 'order=name'),
+      db.get('payments', 'order=created_at.desc')
+    ]);
+    cache.students = students || [];
+    cache.groups = groups || [];
+    cache.teachers = teachers || [];
+    cache.managers = managers || [];
+    cache.payments = payments || [];
+    renderDashboard();
+    renderStudents();
+    renderGroups();
+    renderPayments();
+    renderTeachers();
+    renderManagers();
+    populateFilters();
+  } catch(e) { toast('Ошибка загрузки: ' + e.message, true); }
+}
+
+// ==================== NAV ====================
+const screens = { dashboard:'Дашборд', students:'Студенты', groups:'Группы', payments:'Оплаты', teachers:'Преподаватели', managers:'Менеджеры' };
+const actions = {
+  students: `<button class="btn-primary" onclick="openStudentModal()">+ Добавить студента</button>`,
+  payments: `<button class="btn-primary" onclick="openPaymentModal()">+ Записать оплату</button>`,
+  teachers: `<button class="btn-primary" onclick="openTeacherModal()">+ Преподаватель</button>`,
+  managers: `<button class="btn-primary" onclick="openManagerModal()">+ Менеджер</button>`
+};
+
+function nav(id, el) {
+  document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  if (el) el.classList.add('active');
+  document.getElementById('page-title').textContent = screens[id];
+  document.getElementById('topbar-actions').innerHTML = actions[id] || '';
+}
+
+// ==================== DASHBOARD ====================
+function renderDashboard() {
+  const loading = document.getElementById('dash-loading');
+  const content = document.getElementById('dash-content');
+  loading.style.display = 'none';
+  content.style.display = 'flex';
+
+  const m = new Date().getMonth()+1, y = new Date().getFullYear();
+  const monthPays = cache.payments.filter(p => p.month===m && p.year===y);
+  const paid = monthPays.filter(p => p.status==='Оплачено');
+  const debt = cache.students.filter(s => !paid.find(p => p.student_id===s.id));
+  const totalPaid = paid.reduce((a,p) => a+p.amount, 0);
+  const totalDebt = debt.length * 4000;
+
+  const recentStudents = cache.students.slice(0,5);
+
+  content.innerHTML = `
+    <div class="metrics-grid">
+      <div class="metric"><div class="metric-label">Всего студентов</div><div class="metric-value">${cache.students.length}</div><div class="metric-sub">${cache.groups.length} групп</div></div>
+      <div class="metric green"><div class="metric-label">Оплачено (${monthName(m)})</div><div class="metric-value">${totalPaid.toLocaleString()} с</div><div class="metric-sub">${paid.length} студентов</div></div>
+      <div class="metric amber"><div class="metric-label">Ожидают</div><div class="metric-value">${debt.length}</div><div class="metric-sub">студентов</div></div>
+      <div class="metric"><div class="metric-label">Преподавателей</div><div class="metric-value">${cache.teachers.length}</div><div class="metric-sub">${cache.managers.length} менеджеров</div></div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Последние студенты</span><span class="badge badge-blue">${monthName(m)}</span></div>
+        <table class="table" style="font-size:12px;">
+          <thead><tr><th>Студент</th><th>Группа</th><th>Статус</th></tr></thead>
+          <tbody>
+            ${recentStudents.map(s => {
+              const g = cache.groups.find(g=>g.id===s.group_id);
+              const pay = monthPays.find(p=>p.student_id===s.id);
+              const status = pay ? pay.status : 'Долг';
+              return `<tr>
+                <td><div class="student-cell"><div class="av av-green">${initials(s.full_name)}</div><span>${s.full_name.split(' ').slice(0,2).join(' ')}</span></div></td>
+                <td>${g ? g.name.split('—')[0].trim() : '—'}</td>
+                <td>${statusBadge(status)}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Группы</span></div>
+        ${cache.groups.map(g => {
+          const count = cache.students.filter(s=>s.group_id===g.id).length;
+          const pct = Math.round(count/g.max_students*100);
+          return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+            <div>
+              <div style="font-size:13px;font-weight:500;">${g.name}</div>
+              <div style="font-size:11px;color:var(--text2);">${g.schedule||''} · ${g.time||''}</div>
+            </div>
+            <div class="prog-wrap">
+              <div class="prog-label">${count}/${g.max_students}</div>
+              <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// ==================== STUDENTS ====================
+let filteredStudents = [];
+
+function renderStudents() {
+  document.getElementById('students-loading').style.display = 'none';
+  filteredStudents = [...cache.students];
+  displayStudents();
+}
+
+function filterStudents() {
+  const q = document.getElementById('student-search').value.toLowerCase();
+  const gf = document.getElementById('student-group-filter').value;
+  const sf = document.getElementById('student-status-filter').value;
+  const m = new Date().getMonth()+1, y = new Date().getFullYear();
+
+  filteredStudents = cache.students.filter(s => {
+    const matchQ = !q || s.full_name.toLowerCase().includes(q) || (s.phone||'').includes(q);
+    const matchG = !gf || s.group_id === gf;
+    const pay = cache.payments.find(p => p.student_id===s.id && p.month===m && p.year===y);
+    const status = pay ? pay.status : 'Долг';
+    const matchS = !sf || status === sf;
+    return matchQ && matchG && matchS;
+  });
+  displayStudents();
+}
+
+function displayStudents() {
+  const m = new Date().getMonth()+1, y = new Date().getFullYear();
+  const el = document.getElementById('students-table');
+  if (!filteredStudents.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">👤</div><div class="empty-text">Студенты не найдены</div></div>`;
+    return;
+  }
+  if (window.innerWidth <= 768) {
+    el.innerHTML = filteredStudents.map(s => {
+      const g = cache.groups.find(g=>g.id===s.group_id);
+      const mgr = cache.managers.find(mgr=>mgr.id===s.manager_id);
+      const pay = cache.payments.find(p => p.student_id===s.id && p.month===m && p.year===y);
+      const status = pay ? pay.status : 'Долг';
+      const price = g ? g.price : 0;
+      const teacher = g ? cache.teachers.find(t=>t.id===g.teacher_id) : null;
+      return `<div class="student-mobile-card">
+        <div class="smc-top">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="av av-green" style="width:38px;height:38px;font-size:12px;">${initials(s.full_name)}</div>
+            <div>
+              <div style="font-weight:600;font-size:14px;">${s.full_name}</div>
+              <div style="font-size:12px;color:var(--text2);">${s.phone||'—'}</div>
+            </div>
+          </div>
+          ${statusBadge(status)}
+        </div>
+        <div class="smc-info">
+          <div><span>Группа</span><span>${g ? `<span class="badge badge-blue">${g.subject}</span>` : '—'}</span></div>
+          <div><span>Преподаватель</span><span>${teacher?teacher.name:'—'}</span></div>
+          <div><span>Менеджер</span><span>${mgr?mgr.name:'—'}</span></div>
+          <div><span>Оплата/мес</span><span style="font-weight:600;color:var(--accent);">${price.toLocaleString()} с</span></div>
+        </div>
+        <div class="smc-actions">
+          <button class="btn-secondary" style="flex:1;" onclick="editStudent('${s.id}')">Редактировать</button>
+          <button class="btn-danger" style="flex:1;" onclick="deleteStudent('${s.id}')">Удалить</button>
+        </div>
+      </div>`;
+    }).join('');
+    return;
+  }
+  el.innerHTML = `<div class="tbl-wrap"><table>
+    <thead><tr><th>Студент</th><th>Телефон</th><th>Группа</th><th>Уровень</th><th>Менеджер</th><th>Оплата</th><th>Статус</th><th></th></tr></thead>
+    <tbody>
+      ${filteredStudents.map(s => {
+        const g = cache.groups.find(g=>g.id===s.group_id);
+        const mgr = cache.managers.find(m=>m.id===s.manager_id);
+        const pay = cache.payments.find(p => p.student_id===s.id && p.month===m && p.year===y);
+        const status = pay ? pay.status : 'Долг';
+        const price = g ? g.price : 0;
+        return `<tr>
+          <td><div class="student-cell">
+            <div class="av av-green">${initials(s.full_name)}</div>
+            <div><div class="student-name">${s.full_name}</div><div class="student-date">с ${s.enrolled_at||'—'}</div></div>
+          </div></td>
+          <td>${s.phone||'—'}</td>
+          <td>${g ? `<span class="badge badge-blue">${g.subject}</span>` : '—'}</td>
+          <td style="font-size:12px;">${s.level||'—'}</td>
+          <td style="font-size:12px;">${mgr?mgr.name:'—'}</td>
+          <td style="font-weight:500;">${price.toLocaleString()} с</td>
+          <td>${statusBadge(status)}</td>
+          <td>
+            <button class="btn-secondary" style="padding:4px 10px;font-size:11px;" onclick="editStudent('${s.id}')">Ред.</button>
+            <button class="btn-danger" style="padding:4px 10px;font-size:11px;margin-left:4px;" onclick="deleteStudent('${s.id}')">Удал.</button>
+          </td>
+        </tr>`;
+      }).join('')}
+    </tbody>
+  </table></div>`;
+}
+
+// ==================== GROUPS ====================
+function renderGroups() {
+  document.getElementById('groups-loading').style.display = 'none';
+  const el = document.getElementById('groups-content');
+  if (!cache.groups.length) { el.innerHTML = `<div class="empty"><div class="empty-text">Нет групп</div></div>`; return; }
+  el.innerHTML = `<div class="two-col">${cache.groups.map(g => {
+    const teacher = cache.teachers.find(t=>t.id===g.teacher_id);
+    const students = cache.students.filter(s=>s.group_id===g.id);
+    const pct = Math.round(students.length/g.max_students*100);
+    return `<div class="group-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+        <div class="group-card-name">${g.name}</div>
+        <span class="badge badge-${g.format==='Онлайн'?'blue':'gray'}">${g.format||'Оффлайн'}</span>
+      </div>
+      <div class="group-stats">
+        <div><div class="group-stat-label">Предмет</div><div class="group-stat-val">${g.subject}</div></div>
+        <div><div class="group-stat-label">Преподаватель</div><div class="group-stat-val">${teacher?teacher.name:'—'}</div></div>
+        <div><div class="group-stat-label">График</div><div class="group-stat-val">${g.schedule||'—'}</div></div>
+        <div><div class="group-stat-label">Время</div><div class="group-stat-val">${g.time||'—'}</div></div>
+        <div><div class="group-stat-label">Оплата/мес</div><div class="group-stat-val">${(g.price||0).toLocaleString()} с</div></div>
+        <div><div class="group-stat-label">Студентов</div>
+          <div class="group-stat-val">${students.length}/${g.max_students}
+            <div class="prog-bar" style="margin-top:4px;width:80px;"><div class="prog-fill" style="width:${pct}%"></div></div>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text2);margin-bottom:6px;">Студенты</div>
+      <div class="group-avatars">
+        ${students.map(s=>`<div class="av av-green" title="${s.full_name}">${initials(s.full_name)}</div>`).join('')}
+        ${students.length===0?'<span style="font-size:12px;color:var(--text3);">Нет студентов</span>':''}
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+// ==================== PAYMENTS ====================
+const MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+function monthName(m) { return MONTHS[m-1]; }
+
+function renderPayments() {
+  const now = new Date();
+  const months = [
+    {m: now.getMonth()-1<1?12:now.getMonth(), y: now.getMonth()-1<1?now.getFullYear()-1:now.getFullYear()},
+    {m: now.getMonth()+1, y: now.getFullYear()},
+    {m: now.getMonth()+2>12?1:now.getMonth()+2, y: now.getMonth()+2>12?now.getFullYear()+1:now.getFullYear()}
+  ];
+  currentPayMonth = months[1].m;
+  currentPayYear = months[1].y;
+
+  const monthsEl = document.getElementById('payments-months');
+  monthsEl.innerHTML = months.map(({m,y}) => {
+    const pays = cache.payments.filter(p=>p.month===m&&p.year===y);
+    const total = pays.filter(p=>p.status==='Оплачено').reduce((a,p)=>a+p.amount,0);
+    const count = pays.filter(p=>p.status==='Оплачено').length;
+    return `<div class="month-card">
+      <div class="month-name">${monthName(m)} ${y}</div>
+      <div class="month-amount" style="${total?'color:var(--accent)':'color:var(--text3)'}">${total?total.toLocaleString()+' с':'—'}</div>
+      <div class="month-count">${count} оплатили</div>
+    </div>`;
+  }).join('');
+
+  const tabs = document.getElementById('payments-tabs');
+  tabs.innerHTML = months.map(({m,y},i) =>
+    `<div class="tab ${i===1?'active':''}" onclick="switchPayMonth(${m},${y},this)">${monthName(m)}</div>`
+  ).join('');
+
+  renderPaymentsTable(currentPayMonth, currentPayYear);
+}
+
+function switchPayMonth(m, y, el) {
+  currentPayMonth = m; currentPayYear = y;
+  document.querySelectorAll('#payments-tabs .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderPaymentsTable(m, y);
+}
+
+function statusIcon(status) {
+  if (status === 'Оплачено') return `<span class="pay-icon pay-icon-ok">✓</span>`;
+  if (status === 'Ожидает')  return `<span class="pay-icon pay-icon-wait">◷</span>`;
+  return `<span class="pay-icon pay-icon-debt">✕</span>`;
+}
+
+function renderPaymentsTable(m, y) {
+  document.getElementById('payments-loading').style.display = 'none';
+  const pays = cache.payments.filter(p=>p.month===m&&p.year===y);
+  const el = document.getElementById('payments-table');
+  if (!pays.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-text">Нет оплат за ${monthName(m)}</div></div>`;
+    return;
+  }
+
+  if (window.innerWidth <= 768) {
+    el.innerHTML = pays.map(p => {
+      const s = cache.students.find(st=>st.id===p.student_id);
+      const g = s ? cache.groups.find(gr=>gr.id===s.group_id) : null;
+      const isPaid = p.status === 'Оплачено';
+      return `<div class="pay-card">
+        <div class="pay-card-top">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="av av-green" style="width:36px;height:36px;font-size:11px;">${s?initials(s.full_name):'?'}</div>
+            <div>
+              <div style="font-weight:600;font-size:14px;">${s?s.full_name.split(' ').slice(0,2).join(' '):'Удалён'}</div>
+              <div style="font-size:12px;color:var(--text2);">${g?g.subject:'—'} · ${p.paid_at||'—'}</div>
+            </div>
+          </div>
+          <div class="pay-amount-block ${isPaid?'paid':p.status==='Ожидает'?'wait':'debt'}">
+            <div class="pay-amount-sum">${p.amount.toLocaleString()} с</div>
+            <div class="pay-amount-icon">${statusIcon(p.status)}</div>
+          </div>
+        </div>
+        <div class="smc-actions" style="margin-top:10px;">
+          <button class="btn-secondary" style="flex:1;" onclick="editPayment('${p.id}')">Редактировать</button>
+          <button class="btn-danger" style="flex:1;" onclick="deletePayment('${p.id}')">Удалить</button>
+        </div>
+      </div>`;
+    }).join('');
+    return;
+  }
+
+  el.innerHTML = `<table>
+    <thead><tr><th>Студент</th><th>Группа</th><th>Сумма</th><th>Дата оплаты</th><th>№ урока</th><th>Принял</th><th>Статус</th><th></th></tr></thead>
+    <tbody>
+      ${pays.map(p => {
+        const s = cache.students.find(st=>st.id===p.student_id);
+        const g = s ? cache.groups.find(gr=>gr.id===s.group_id) : null;
+        return `<tr>
+          <td><div class="student-cell"><div class="av av-green">${s?initials(s.full_name):'?'}</div>${s?s.full_name.split(' ').slice(0,2).join(' '):'Удалён'}</div></td>
+          <td>${g?`<span class="badge badge-blue">${g.subject}</span>`:'—'}</td>
+          <td style="font-weight:500;">${p.amount.toLocaleString()} с</td>
+          <td>${p.paid_at||'—'}</td>
+          <td>${p.lesson_number||'—'}</td>
+          <td>${p.received_by||'Админ'}</td>
+          <td>${statusBadge(p.status)}</td>
+          <td>
+            <button class="btn-secondary" style="padding:4px 10px;font-size:11px;" onclick="editPayment('${p.id}')">Ред.</button>
+            <button class="btn-danger" style="padding:4px 10px;font-size:11px;margin-left:4px;" onclick="deletePayment('${p.id}')">Удал.</button>
+          </td>
+        </tr>`;
+      }).join('')}
+    </tbody>
+  </table>`;
+}
+
+// ==================== TEACHERS ====================
+function renderTeachers() {
+  document.getElementById('teachers-loading').style.display = 'none';
+  const el = document.getElementById('teachers-content');
+  const colors = ['av-green','av-blue','av-amber','av-purple'];
+  el.innerHTML = cache.teachers.map((t,i) => {
+    const groups = cache.groups.filter(g=>g.teacher_id===t.id);
+    const studentCount = groups.reduce((a,g)=>a+cache.students.filter(s=>s.group_id===g.id).length,0);
+    return `<div class="teacher-card">
+      <div class="teacher-head">
+        <div class="teacher-av ${colors[i%4]}">${initials(t.name)}</div>
+        <div><div class="teacher-name">${t.name}</div><div class="teacher-role">Преподаватель</div></div>
+      </div>
+      <div class="teacher-rows">
+        <div class="teacher-row"><span>Предметы</span><span>${(t.subjects||[]).join(', ')||'—'}</span></div>
+        <div class="teacher-row"><span>Групп</span><span>${groups.length}</span></div>
+        <div class="teacher-row"><span>Студентов</span><span>${studentCount}</span></div>
+        ${t.phone?`<div class="teacher-row"><span>Телефон</span><span>${t.phone}</span></div>`:''}
+      </div>
+      <div style="display:flex;gap:6px;margin-top:12px;">
+        <button class="btn-secondary" style="font-size:11px;padding:5px 10px;" onclick="editTeacher('${t.id}')">Редактировать</button>
+        <button class="btn-danger" style="font-size:11px;padding:5px 10px;" onclick="deleteTeacher('${t.id}')">Удалить</button>
+      </div>
+    </div>`;
+  }).join('') || `<div class="empty" style="grid-column:1/-1;"><div class="empty-text">Нет преподавателей</div></div>`;
+}
+
+// ==================== MANAGERS ====================
+function renderManagers() {
+  document.getElementById('managers-loading').style.display = 'none';
+  const el = document.getElementById('managers-content');
+  const colors = ['av-blue','av-amber','av-purple','av-green'];
+  el.innerHTML = cache.managers.map((m,i) => {
+    const students = cache.students.filter(s=>s.manager_id===m.id);
+    return `<div class="teacher-card">
+      <div class="teacher-head">
+        <div class="teacher-av ${colors[i%4]}">${initials(m.name)}</div>
+        <div><div class="teacher-name">${m.name}</div><div class="teacher-role">Менеджер</div></div>
+      </div>
+      <div class="teacher-rows">
+        <div class="teacher-row"><span>Студентов привёл</span><span>${students.length}</span></div>
+        ${m.phone?`<div class="teacher-row"><span>Телефон</span><span>${m.phone}</span></div>`:''}
+      </div>
+      <div style="display:flex;gap:6px;margin-top:12px;">
+        <button class="btn-secondary" style="font-size:11px;padding:5px 10px;" onclick="editManager('${m.id}')">Редактировать</button>
+        <button class="btn-danger" style="font-size:11px;padding:5px 10px;" onclick="deleteManager('${m.id}')">Удалить</button>
+      </div>
+    </div>`;
+  }).join('') || `<div class="empty" style="grid-column:1/-1;"><div class="empty-text">Нет менеджеров</div></div>`;
+}
+
+// ==================== MODALS ====================
+function openStudentModal(student=null) {
+  const isEdit = !!student;
+  document.getElementById('student-modal-title').textContent = isEdit ? 'Редактировать студента' : 'Добавить студента';
+  document.getElementById('student-id').value = student?.id || '';
+  document.getElementById('s-name').value = student?.full_name || '';
+  document.getElementById('s-phone').value = student?.phone || '';
+  document.getElementById('s-gender').value = student?.gender || '';
+  document.getElementById('s-level').value = student?.level || 'Жакшы (0-1)';
+  document.getElementById('s-enrolled').value = student?.enrolled_at || new Date().toISOString().split('T')[0];
+
+  const gs = document.getElementById('s-group');
+  gs.innerHTML = '<option value="">—</option>' + cache.groups.map(g=>`<option value="${g.id}" ${student?.group_id===g.id?'selected':''}>${g.name}</option>`).join('');
+  const ms = document.getElementById('s-manager');
+  ms.innerHTML = '<option value="">—</option>' + cache.managers.map(m=>`<option value="${m.id}" ${student?.manager_id===m.id?'selected':''}>${m.name}</option>`).join('');
+
+  openModal('modal-student');
+}
+
+async function saveStudent() {
+  const id = document.getElementById('student-id').value;
+  const data = {
+    full_name: document.getElementById('s-name').value.trim(),
+    phone: document.getElementById('s-phone').value.trim(),
+    gender: document.getElementById('s-gender').value,
+    group_id: document.getElementById('s-group').value || null,
+    manager_id: document.getElementById('s-manager').value || null,
+    level: document.getElementById('s-level').value,
+    enrolled_at: document.getElementById('s-enrolled').value || null,
+    whatsapp: true
+  };
+  if (!data.full_name) { toast('Введите ФИО', true); return; }
+  try {
+    if (id) { await db.patch('students', id, data); toast('Студент обновлён'); }
+    else { await db.post('students', data); toast('Студент добавлен'); }
+    closeModal('modal-student');
+    await loadAll();
+  } catch(e) { toast('Ошибка: ' + e.message, true); }
+}
+
+function editStudent(id) {
+  const s = cache.students.find(s=>s.id===id);
+  if (s) openStudentModal(s);
+}
+
+async function deleteStudent(id) {
+  if (!confirm('Удалить студента?')) return;
+  try { await db.delete('students', id); toast('Удалено'); await loadAll(); }
+  catch(e) { toast('Ошибка: ' + e.message, true); }
+}
+
+function openPaymentModal(pay=null) {
+  document.getElementById('payment-modal-title').textContent = pay ? 'Редактировать оплату' : 'Записать оплату';
+  document.getElementById('pay-id').value = pay?.id || '';
+  document.getElementById('pay-month').value = pay?.month || (new Date().getMonth()+1);
+  document.getElementById('pay-year').value = pay?.year || new Date().getFullYear();
+  document.getElementById('pay-amount').value = pay?.amount || '';
+  document.getElementById('pay-status').value = pay?.status || 'Оплачено';
+  document.getElementById('pay-date').value = pay?.paid_at || new Date().toISOString().split('T')[0];
+  document.getElementById('pay-lesson').value = pay?.lesson_number || '';
+  document.getElementById('pay-comment').value = pay?.comment || '';
+
+  const ps = document.getElementById('pay-student');
+  ps.innerHTML = cache.students.map(s=>`<option value="${s.id}" ${pay?.student_id===s.id?'selected':''}>${s.full_name}</option>`).join('');
+
+  openModal('modal-payment');
+}
+
+async function savePayment() {
+  const id = document.getElementById('pay-id').value;
+  const data = {
+    student_id: document.getElementById('pay-student').value,
+    month: parseInt(document.getElementById('pay-month').value),
+    year: parseInt(document.getElementById('pay-year').value),
+    amount: parseInt(document.getElementById('pay-amount').value) || 0,
+    status: document.getElementById('pay-status').value,
+    paid_at: document.getElementById('pay-date').value || null,
+    lesson_number: parseInt(document.getElementById('pay-lesson').value) || null,
+    received_by: 'Админ',
+    comment: document.getElementById('pay-comment').value || null
+  };
+  if (!data.student_id) { toast('Выберите студента', true); return; }
+  try {
+    if (id) { await db.patch('payments', id, data); toast('Оплата обновлена'); }
+    else { await db.post('payments', data); toast('Оплата записана'); }
+    closeModal('modal-payment');
+    await loadAll();
+  } catch(e) { toast('Ошибка: ' + e.message, true); }
+}
+
+function editPayment(id) {
+  const p = cache.payments.find(p=>p.id===id);
+  if (p) openPaymentModal(p);
+}
+
+async function deletePayment(id) {
+  if (!confirm('Удалить запись об оплате?')) return;
+  try { await db.delete('payments', id); toast('Удалено'); await loadAll(); }
+  catch(e) { toast('Ошибка: ' + e.message, true); }
+}
+
+function openTeacherModal(t=null) {
+  document.getElementById('teacher-modal-title').textContent = t ? 'Редактировать' : 'Добавить преподавателя';
+  document.getElementById('t-id').value = t?.id || '';
+  document.getElementById('t-name').value = t?.name || '';
+  document.getElementById('t-phone').value = t?.phone || '';
+  document.getElementById('t-subjects').value = (t?.subjects||[]).join(', ');
+  openModal('modal-teacher');
+}
+
+async function saveTeacher() {
+  const id = document.getElementById('t-id').value;
+  const data = {
+    name: document.getElementById('t-name').value.trim(),
+    phone: document.getElementById('t-phone').value.trim() || null,
+    subjects: document.getElementById('t-subjects').value.split(',').map(s=>s.trim()).filter(Boolean)
+  };
+  if (!data.name) { toast('Введите имя', true); return; }
+  try {
+    if (id) { await db.patch('teachers', id, data); toast('Обновлено'); }
+    else { await db.post('teachers', data); toast('Преподаватель добавлен'); }
+    closeModal('modal-teacher');
+    await loadAll();
+  } catch(e) { toast('Ошибка: ' + e.message, true); }
+}
+
+function editTeacher(id) {
+  const t = cache.teachers.find(t=>t.id===id);
+  if (t) openTeacherModal(t);
+}
+
+async function deleteTeacher(id) {
+  if (!confirm('Удалить преподавателя?')) return;
+  try { await db.delete('teachers', id); toast('Удалено'); await loadAll(); }
+  catch(e) { toast('Ошибка: ' + e.message, true); }
+}
+
+function openManagerModal(m=null) {
+  document.getElementById('m-id').value = m?.id || '';
+  document.getElementById('m-name').value = m?.name || '';
+  document.getElementById('m-phone').value = m?.phone || '';
+  openModal('modal-manager');
+}
+
+async function saveManager() {
+  const id = document.getElementById('m-id').value;
+  const data = {
+    name: document.getElementById('m-name').value.trim(),
+    phone: document.getElementById('m-phone').value.trim() || null
+  };
+  if (!data.name) { toast('Введите имя', true); return; }
+  try {
+    if (id) { await db.patch('managers', id, data); toast('Обновлено'); }
+    else { await db.post('managers', data); toast('Менеджер добавлен'); }
+    closeModal('modal-manager');
+    await loadAll();
+  } catch(e) { toast('Ошибка: ' + e.message, true); }
+}
+
+function editManager(id) {
+  const m = cache.managers.find(m=>m.id===id);
+  if (m) openManagerModal(m);
+}
+
+async function deleteManager(id) {
+  if (!confirm('Удалить менеджера?')) return;
+  try { await db.delete('managers', id); toast('Удалено'); await loadAll(); }
+  catch(e) { toast('Ошибка: ' + e.message, true); }
+}
+
+// ==================== UTILS ====================
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('modal-overlay')) {
+    e.target.classList.remove('open');
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
+});
+
+function populateFilters() {
+  const gf = document.getElementById('student-group-filter');
+  gf.innerHTML = '<option value="">Все группы</option>' + cache.groups.map(g=>`<option value="${g.id}">${g.name}</option>`).join('');
+}
+
+function initials(name) {
+  if (!name) return '?';
+  const parts = name.trim().split(' ');
+  return (parts[0][0]||'') + (parts[1]?parts[1][0]:'');
+}
+
+function statusBadge(status) {
+  const map = { 'Оплачено':'badge-green', 'Ожидает':'badge-amber', 'Долг':'badge-red' };
+  return `<span class="badge ${map[status]||'badge-gray'}">${status}</span>`;
+}
+
+let toastTimer;
+function toast(msg, isError=false) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (isError?' error':'');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove('show'), 3000);
+}
+
+
+function formatKGPhone(input) {
+  let v = input.value.replace(/[^0-9]/g, '');
+  if (v.startsWith('996')) v = v.slice(3);
+  if (v.startsWith('0')) v = v.slice(1);
+  v = v.slice(0, 9);
+  let result = '+996';
+  if (v.length > 0) result += ' ' + v.slice(0, 3);
+  if (v.length > 3) result += ' ' + v.slice(3, 6);
+  if (v.length > 6) result += ' ' + v.slice(6, 9);
+  input.value = result === '+996' ? '' : result;
+}
+
+
+// ===== MOBILE NAV =====
+let _mobileScreen = 'dashboard';
+const _mobileAddActions = {
+  students: () => openStudentModal(),
+  payments: () => openPaymentModal(),
+  teachers: () => openTeacherModal(),
+  managers: () => openManagerModal()
+};
+
+function mobileNav(id, el) {
+  _mobileScreen = id;
+  // Trigger desktop nav
+  const TITLES_MAP = {
+    dashboard:'Дашборд', students:'Студенты',
+    groups:'Группы', payments:'Оплаты',
+    teachers:'Преподаватели', managers:'Менеджеры'
+  };
+  document.querySelectorAll('.nav-item').forEach(item => {
+    if (item.textContent.trim() === TITLES_MAP[id]) item.click();
+  });
+  // Update mobile active
+  document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  // Update add button
+  const addBtn = document.getElementById('mobile-add-btn');
+  if (addBtn) {
+    addBtn.style.display = _mobileAddActions[id] ? 'flex' : 'none';
+    addBtn.onclick = _mobileAddActions[id] || null;
+  }
+}
+
+// Auto-connect on load
+window.addEventListener('load', () => {
+  document.getElementById('sb-url').value = 'https://savoanawjdayrxlghjmx.supabase.co';
+  document.getElementById('sb-key').value = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhdm9hbmF3amRheXJ4bGdoam14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3NDYzNjgsImV4cCI6MjA5MjMyMjM2OH0.qEXP-hCU2fFqeCDGbaTp_mGX3jhU3hMRW-4OQeFOtlg';
+  connectSupabase();
+});
+
+
+
+// Enter key on setup
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('setup-screen').style.display !== 'none') {
+    connectSupabase();
+  }
+});
+</script>
+</body>
+</html>
