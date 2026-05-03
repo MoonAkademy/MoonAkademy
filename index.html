@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MoonAkademy</title>
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="MoonAkademy">
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="theme-color" content="#1A5C3A">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
@@ -267,21 +273,15 @@ table { min-width: unset; }
    MOBILE RESPONSIVE — телефоны до 768px
    ================================================ */
 @media (max-width: 768px) {
-  /* Скрываем сайдбар — заменяем нижней навигацией */
   .sidebar { display: none; }
-
-  /* Главный контейнер */
   .layout { flex-direction: column; height: 100vh; }
-
   .main { 
     flex: 1; 
     display: flex; 
     flex-direction: column; 
     overflow: hidden;
-    padding-bottom: 64px; /* место для нижней навигации */
+    padding-bottom: 64px;
   }
-
-  /* Топбар */
   .topbar { 
     padding: 12px 16px; 
     position: sticky;
@@ -293,14 +293,10 @@ table { min-width: unset; }
     padding: 7px 12px; 
     font-size: 12px; 
   }
-
-  /* Контент */
   .content { 
     padding: 12px 12px 16px;
     gap: 12px;
   }
-
-  /* Метрики — 2 колонки на телефоне */
   .metrics-grid { 
     grid-template-columns: 1fr 1fr; 
     gap: 8px; 
@@ -308,47 +304,29 @@ table { min-width: unset; }
   .metric { padding: 12px; }
   .metric-value { font-size: 22px; }
   .metric-label { font-size: 11px; }
-
-  /* Две колонки → одна */
   .two-col { grid-template-columns: 1fr; gap: 10px; }
   .three-col { grid-template-columns: 1fr; gap: 8px; }
-
-  /* Таблицы — скролл по горизонтали */
   .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   table { min-width: 600px; font-size: 12px; }
   th, td { padding: 8px 10px; }
-
-  /* Скрываем некоторые колонки на мобильном */
   .tbl-wrap table th:nth-child(5),
   .tbl-wrap table td:nth-child(5),
   .tbl-wrap table th:nth-child(6),
   .tbl-wrap table td:nth-child(6) { display: none; }
-
-  /* Карточки студентов — полная ширина */
   .student-cell { gap: 8px; }
   .student-name { font-size: 13px; }
-
-  /* Группы */
   .group-card { padding: 14px; margin-bottom: 10px; }
   .group-card-name { font-size: 14px; }
   .group-stats { grid-template-columns: 1fr 1fr; }
-
-  /* Оплаты — месяцы */
   .month-grid { grid-template-columns: 1fr; gap: 8px; }
   .month-card { padding: 12px; }
   .month-amount { font-size: 20px; }
-
-  /* Карточки преподавателей */
   .teacher-card { padding: 14px; }
   .teacher-head { gap: 10px; }
   .teacher-av { width: 38px; height: 38px; font-size: 13px; }
-
-  /* Поиск */
   .search-row { flex-wrap: wrap; gap: 8px; }
   .search-input { width: 100%; }
   .filter-select { flex: 1; font-size: 12px; padding: 6px 8px; }
-
-  /* Модальные окна — снизу как sheet */
   .modal-overlay { align-items: flex-end; }
   .modal { 
     border-radius: 20px 20px 0 0; 
@@ -360,7 +338,7 @@ table { min-width: unset; }
   .modal-title { font-size: 17px; }
   .form-input, .form-select { 
     padding: 12px; 
-    font-size: 16px; /* предотвращает зум на iOS */
+    font-size: 16px;
   }
   .form-2col { grid-template-columns: 1fr; }
   .modal-footer { gap: 8px; }
@@ -370,21 +348,13 @@ table { min-width: unset; }
     font-size: 15px; 
     flex: 1;
   }
-
-  /* Аватары */
   .av { width: 36px; height: 36px; font-size: 12px; }
-
-  /* Кнопки действий в таблице */
   .tbl-wrap button { 
     padding: 4px 8px !important; 
     font-size: 11px !important; 
   }
-
-  /* Табы оплат */
   .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .tab { white-space: nowrap; padding: 8px 14px; }
-
-  /* Карточки группы на мобиле */
   .two-col .group-card { padding: 14px; }
 }
 
@@ -431,13 +401,7 @@ table { min-width: unset; }
   }
 }
 
-
-/* ================================================
-   MOBILE — все телефоны до 768px
-   ================================================ */
 @media (max-width: 768px) {
-
-  /* Layout */
   .sidebar { display: none !important; }
   .layout { height: 100vh; overflow: hidden; }
   .main { 
@@ -446,8 +410,6 @@ table { min-width: unset; }
     height: 100vh;
     overflow: hidden;
   }
-
-  /* Topbar */
   .topbar { 
     padding: 12px 14px; 
     flex-shrink: 0;
@@ -456,8 +418,6 @@ table { min-width: unset; }
   .topbar-actions { gap: 6px; }
   .btn-primary { padding: 8px 12px; font-size: 13px; }
   .btn-secondary { padding: 8px 10px; font-size: 13px; }
-
-  /* Content area — scrollable */
   .content {
     flex: 1;
     overflow-y: auto;
@@ -468,8 +428,6 @@ table { min-width: unset; }
     flex-direction: column;
   }
   .content.active { display: flex; }
-
-  /* Metrics — 2x2 grid */
   .metrics-grid { 
     grid-template-columns: 1fr 1fr; 
     gap: 8px; 
@@ -478,13 +436,9 @@ table { min-width: unset; }
   .metric-value { font-size: 22px; }
   .metric-label { font-size: 11px; }
   .metric-sub { font-size: 11px; }
-
-  /* Cards */
   .card { padding: 14px; border-radius: 14px; }
   .two-col { grid-template-columns: 1fr !important; gap: 10px; }
   .three-col { grid-template-columns: 1fr !important; gap: 8px; }
-
-  /* DASHBOARD — заменяем таблицу на карточки */
   #dash-content table { display: none; }
   #dash-content .tbl-wrap { 
     background: none; 
@@ -508,8 +462,6 @@ table { min-width: unset; }
   #dash-content td:first-child { flex: 1; }
   #dash-content td:nth-child(2) { display: none; }
   #dash-content td:last-child { flex-shrink: 0; }
-
-  /* STUDENTS table → card list */
   #students-table table { display: none; }
   #students-table .tbl-wrap {
     background: none;
@@ -518,15 +470,13 @@ table { min-width: unset; }
     padding: 0;
     overflow: visible;
   }
-
-  /* Search row */
   .search-row { 
     flex-wrap: wrap; 
     gap: 8px; 
   }
   .search-input { 
     width: 100%;
-    font-size: 16px; /* no zoom on iOS */
+    font-size: 16px;
     padding: 11px 12px;
     border-radius: 12px;
   }
@@ -536,8 +486,6 @@ table { min-width: unset; }
     padding: 9px 8px;
     border-radius: 10px;
   }
-
-  /* Groups */
   .two-col .group-card,
   .group-card { 
     padding: 14px;
@@ -546,16 +494,12 @@ table { min-width: unset; }
   }
   .group-card-name { font-size: 15px; }
   .group-stats { grid-template-columns: 1fr 1fr; gap: 8px; }
-
-  /* Payments months */
   .month-grid { 
     grid-template-columns: 1fr !important;
     gap: 8px; 
   }
   .month-card { padding: 14px; border-radius: 12px; }
   .month-amount { font-size: 22px; }
-
-  /* Payments table → scrollable */
   .tbl-wrap { 
     overflow-x: auto; 
     -webkit-overflow-scrolling: touch; 
@@ -566,22 +510,16 @@ table { min-width: unset; }
     font-size: 13px;
   }
   th, td { padding: 9px 10px; }
-
-  /* Hide some columns */
   .tbl-wrap table th:nth-child(4),
   .tbl-wrap table td:nth-child(4),
   .tbl-wrap table th:nth-child(6),
   .tbl-wrap table td:nth-child(6) { display: none; }
-
-  /* Teacher cards */
   .teacher-card { padding: 14px; border-radius: 14px; }
   .teacher-head { gap: 10px; }
   .teacher-av { width: 40px; height: 40px; font-size: 13px; }
   .teacher-name { font-size: 15px; }
   .teacher-rows { gap: 8px; }
   .teacher-row { font-size: 13px; }
-
-  /* Modal → bottom sheet */
   .modal-overlay { 
     align-items: flex-end !important; 
   }
@@ -605,7 +543,7 @@ table { min-width: unset; }
   .modal-close { top: 20px; }
   .form-input, .form-select { 
     padding: 13px 12px;
-    font-size: 16px !important; /* prevent iOS zoom */
+    font-size: 16px !important;
     border-radius: 12px;
   }
   .form-2col { grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -620,20 +558,14 @@ table { min-width: unset; }
     border-radius: 12px;
     flex: 1;
   }
-
-  /* Tabs */
   .tabs { 
     overflow-x: auto; 
     -webkit-overflow-scrolling: touch;
     flex-wrap: nowrap;
   }
   .tab { white-space: nowrap; padding: 9px 14px; font-size: 13px; }
-
-  /* Avatar */
   .av { width: 36px; height: 36px; font-size: 11px; }
   .student-cell { gap: 8px; }
-
-  /* Action buttons in table */
   tbody button { 
     padding: 4px 8px !important; 
     font-size: 11px !important;
@@ -1102,7 +1034,6 @@ function renderDashboard() {
   const paid = monthPays.filter(p => p.status==='Оплачено');
   const debt = cache.students.filter(s => !paid.find(p => p.student_id===s.id));
   const totalPaid = paid.reduce((a,p) => a+p.amount, 0);
-  const totalDebt = debt.length * 4000;
 
   const recentStudents = cache.students.slice(0,5);
 
@@ -1652,7 +1583,6 @@ function toast(msg, isError=false) {
   toastTimer = setTimeout(()=>el.classList.remove('show'), 3000);
 }
 
-
 function formatKGPhone(input) {
   let v = input.value.replace(/[^0-9]/g, '');
   if (v.startsWith('996')) v = v.slice(3);
@@ -1665,7 +1595,6 @@ function formatKGPhone(input) {
   input.value = result === '+996' ? '' : result;
 }
 
-
 // ===== MOBILE NAV =====
 let _mobileScreen = 'dashboard';
 const _mobileAddActions = {
@@ -1677,7 +1606,6 @@ const _mobileAddActions = {
 
 function mobileNav(id, el) {
   _mobileScreen = id;
-  // Trigger desktop nav
   const TITLES_MAP = {
     dashboard:'Дашборд', students:'Студенты',
     groups:'Группы', payments:'Оплаты',
@@ -1686,10 +1614,8 @@ function mobileNav(id, el) {
   document.querySelectorAll('.nav-item').forEach(item => {
     if (item.textContent.trim() === TITLES_MAP[id]) item.click();
   });
-  // Update mobile active
   document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
-  // Update add button
   const addBtn = document.getElementById('mobile-add-btn');
   if (addBtn) {
     addBtn.style.display = _mobileAddActions[id] ? 'flex' : 'none';
@@ -1704,14 +1630,16 @@ window.addEventListener('load', () => {
   connectSupabase();
 });
 
-
-
-// Enter key on setup
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && document.getElementById('setup-screen').style.display !== 'none') {
     connectSupabase();
   }
 });
+
+// ===== SERVICE WORKER =====
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
 </script>
 </body>
 </html>
